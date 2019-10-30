@@ -1,0 +1,28 @@
+<resources>
+<string-array name="book_array">
+    <item>To Kill a Mockingbird</item>
+    <item>Pride and Prejudice</item>
+    <item>The Diary of Anne Frank</item>
+    <item>1984</item>
+    <item>Harry Potter and the Sorcerer\'s Stone</item>
+    <item>The Great Gatsby</item>
+    <item>The Hobbit</item>
+    <item>Little Women</item>
+    <item>Fahrenheit 451</item>
+    <item>Animal Farm</item>
+    <item>Gone with the Wind</item>
+    <item>The Adventures of Huckleberry Finn</item>
+    <item>To Kill a Mockingbird</item>
+    <item>Pride and Prejudice</item>
+    <item>The Diary of Anne Frank</item>
+    <item>1984</item>
+    <item>Harry Potter and the Sorcerer\'s Stone</item>
+    <item>The Great Gatsby</item>
+    <item>The Hobbit</item>
+    <item>Little Women</item>
+    <item>Fahrenheit 451</item>
+    <item>Animal Farm</item>
+    <item>Gone with the Wind</item>
+    <item>The Adventures of Huckleberry Finn</item>
+</string-array>
+</resources>
