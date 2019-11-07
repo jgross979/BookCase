@@ -26,22 +26,21 @@ public class ViewPagerFragment extends Fragment {
 
     //Global structures and variables
     private ViewPager viewPager;
-    private ArrayList<String> bookNames;
+    private ArrayList<Book> books;
     protected ArrayList<BookDetailsFragment> detailsFragments = new ArrayList<>();
 
     //Global keys
-    private static final String BOOK_NAMES = "bookNames";
+    private static final String BOOK_LIST = "bookList";
 
 
     public ViewPagerFragment() {
         // Required empty public constructor
     }
 
-    public static ViewPagerFragment newInstance(List<String> bookNames) {
+    public static ViewPagerFragment newInstance(ArrayList<Book> books) {
         ViewPagerFragment fragment = new ViewPagerFragment();
         Bundle args = new Bundle();
-
-        args.putStringArrayList(BOOK_NAMES, (ArrayList<String>) bookNames);
+        args.putParcelableArrayList(BOOK_LIST, books);
 
         fragment.setArguments(args);
         return fragment;
@@ -51,8 +50,8 @@ public class ViewPagerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bookNames = getArguments().getStringArrayList(BOOK_NAMES);
-            createDetailFragmentList(bookNames);
+            books = getArguments().getParcelableArrayList(BOOK_LIST);
+            createDetailFragmentList(books);
         }
     }
 
@@ -71,11 +70,11 @@ public class ViewPagerFragment extends Fragment {
     }
 
     //creates the BookDetailsFragments and places them into the arrayList
-    public void createDetailFragmentList(List<String> bookTitles){
+    public void createDetailFragmentList(List<Book> books){
         detailsFragments = new ArrayList<>();
 
-        for(String bookTitle: bookTitles){
-            BookDetailsFragment bdf = BookDetailsFragment.newInstance(bookTitle);
+        for(Book book: books){
+            BookDetailsFragment bdf = BookDetailsFragment.newInstance(book);
             detailsFragments.add(bdf);
         }
 
@@ -103,6 +102,9 @@ public class ViewPagerFragment extends Fragment {
         public int getCount() {
             return detailsFragments.size();
         }
+
+        @Override
+        public int getItemPosition(Object object) { return PagerAdapter.POSITION_NONE; }
     }
 
 

@@ -20,9 +20,11 @@ import java.util.List;
 
 public class BookListFragment extends Fragment {
 
-    private static final String BOOK_ARRAY_LIST = "books";
+    private static final String BOOK_LIST = "bookList";
 
-    private List<String> bookList;
+    private ArrayList<Book> books;
+
+    private ArrayList<String> bookNames;
 
     private BookListListener mListener;
 
@@ -35,11 +37,11 @@ public class BookListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static BookListFragment newInstance(List<String> books) {
+    public static BookListFragment newInstance(ArrayList<Book> books) {
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
 
-        args.putStringArrayList(BOOK_ARRAY_LIST, (ArrayList<String>) books);
+        args.putParcelableArrayList(BOOK_LIST, books);
 
         fragment.setArguments(args);
         return fragment;
@@ -49,7 +51,7 @@ public class BookListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bookList = getArguments().getStringArrayList(BOOK_ARRAY_LIST);
+            books = getArguments().getParcelableArrayList(BOOK_LIST);
         }
     }
 
@@ -58,10 +60,11 @@ public class BookListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_book_list, container, false);
+        setBookNames();
 
         //Create Adapter
         ArrayAdapter <String> adapter = new ArrayAdapter<String>(parent,
-                android.R.layout.simple_list_item_1, bookList);
+                android.R.layout.simple_list_item_1, bookNames);
 
         listView = v.findViewById(R.id.listView);
 
@@ -70,8 +73,8 @@ public class BookListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String bookName = bookList.get(position);
-                ((BookListListener) mListener).onBookListInteraction(bookName);
+                Book book = books.get(position);
+                mListener.onBookListInteraction(book);
             }
         });
 
@@ -102,8 +105,15 @@ public class BookListFragment extends Fragment {
         mListener = null;
     }
 
+    public void setBookNames(){
+        bookNames = new ArrayList<>();
+        for(Book book: books){
+            bookNames.add(book.getTitle());
+        }
+    }
+
 
     public interface BookListListener {
-        public void onBookListInteraction(String bookName);
+        public void onBookListInteraction(Book book);
     }
 }

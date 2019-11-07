@@ -1,28 +1,44 @@
 package edu.temple.bookcase;
 
-import android.content.Context;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.squareup.picasso.Picasso;
+
+import java.net.URL;
 
 
 public class BookDetailsFragment extends Fragment {
 
-    private static final String BOOK_NAME = "bookName";
+    //Keys
+    private static final String BOOK_ID = "bookID";
+    private static final String BOOK_TITLE = "bookTitle";
+    private static final String BOOK_AUTHOR = "bookAuthor";
+    private static final String BOOK_PUBLISHED = "bookPublished";
+    private static final String BOOK_COVER_URL = "bookCoverURL";
 
-    private String bookName;
+    //Book Variables
+    private int bookID;
+    private String bookTitle;
+    private String bookAuthor;
+    private int bookPublished;
+    private String bookCoverURL;
+
+    //Views
+    TextView titleText;
+    TextView authorText;
+    TextView bookPublishedText;
+    ImageView bookCover;
+
 
 
     public BookDetailsFragment() {
@@ -30,11 +46,15 @@ public class BookDetailsFragment extends Fragment {
     }
 
 
-    public static BookDetailsFragment newInstance(String bookName) {
+    public static BookDetailsFragment newInstance(Book book) {
         BookDetailsFragment fragment = new BookDetailsFragment();
         Bundle args = new Bundle();
 
-        args.putString(BOOK_NAME, bookName);
+        args.putInt(BOOK_ID, book.getId());
+        args.putString(BOOK_TITLE, book.getTitle());
+        args.putString(BOOK_AUTHOR, book.getAuthor());
+        args.putInt(BOOK_PUBLISHED, book.getPublished());
+        args.putString(BOOK_COVER_URL, book.getCoverURL());
 
         fragment.setArguments(args);
         return fragment;
@@ -44,7 +64,11 @@ public class BookDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bookName = getArguments().getString(BOOK_NAME);
+            bookID = getArguments().getInt(BOOK_ID);
+            bookTitle = getArguments().getString(BOOK_TITLE);
+            bookAuthor = getArguments().getString(BOOK_AUTHOR);
+            bookPublished = getArguments().getInt(BOOK_PUBLISHED);
+            bookCoverURL = getArguments().getString(BOOK_COVER_URL);
         }
     }
 
@@ -53,16 +77,36 @@ public class BookDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_book_details, container, false);
+        titleText = v.findViewById(R.id.titleText);
+        authorText = v.findViewById(R.id.authorText);
+        bookCover = v.findViewById(R.id.bookCover);
+        bookPublishedText = v.findViewById(R.id.publishedText);
 
-        displayBook(bookName, v);
+        //Set text and the image URL
+        titleText.setText(bookTitle);
+        authorText.setText(bookAuthor);
+        bookPublishedText.setText(Integer.toString(bookPublished));
+
+        //Set up error logging for picasso
+        Picasso.get().setLoggingEnabled(true);
+        //Load URL image into book cover
+        Picasso.get().load(bookCoverURL).fit().into(bookCover);
+
+
+//        displayBook(bookName, v);
 
         return v;
     }
 
-    public void displayBook(String title, View v){
-        TextView bookTitleText = v.findViewById(R.id.bookTitleText);
+    public void displayBook(String bookTitle, String bookAuthor, String bookCoverURL, View v){
+        titleText = v.findViewById(R.id.titleText);
+        authorText = v.findViewById(R.id.authorText);
+        bookCover = v.findViewById(R.id.bookCover);
 
-        bookTitleText.setText(bookName);
+         titleText.setText(bookTitle);
+         authorText.setText(bookAuthor);
+
+
     }
 
 
