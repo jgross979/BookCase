@@ -80,6 +80,11 @@ public class ViewPagerFragment extends Fragment {
 
     }
 
+    //Method to pass on the bookList to another fragment
+    public ArrayList<Book> getBookList(){
+        return books;
+    }
+
     private PagerAdapter buildAdapter() {
         return(new ViewFragmentAdapter(getActivity(), getChildFragmentManager()));
     }

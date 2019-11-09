@@ -98,15 +98,13 @@ public class BookDetailsFragment extends Fragment {
         return v;
     }
 
-    public void displayBook(String bookTitle, String bookAuthor, String bookCoverURL, View v){
-        titleText = v.findViewById(R.id.titleText);
-        authorText = v.findViewById(R.id.authorText);
-        bookCover = v.findViewById(R.id.bookCover);
 
-         titleText.setText(bookTitle);
-         authorText.setText(bookAuthor);
-
-
+    //Used to update the fragment without generating a new fragment
+    public void displayBook(Book book){
+         titleText.setText(book.getTitle());
+         authorText.setText(book.getAuthor());
+         bookPublishedText.setText(Integer.toString(book.getPublished()));
+         Picasso.get().load(book.getCoverURL()).fit().into(bookCover);
     }
 
 

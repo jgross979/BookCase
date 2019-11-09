@@ -45,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     //Initialize worker thread
     Thread t;
 
+    //Holds status of the containers
+    private Fragment fragmentContainer;
+    private Fragment fragmentContainer2;
+
     //Handler sets the JSON object for use
     public Handler displayHandler = new Handler(new Handler.Callback() {
         @Override
@@ -64,13 +68,26 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setBookJSON();
-        //Wait for worker thread to finish gathering books from API
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        //Get status of the fragment containers
+        fragmentContainer = getSupportFragmentManager().findFragmentById(R.id.container);
+        fragmentContainer2 = getSupportFragmentManager().findFragmentById(R.id.container_2);
+
+        //Set the bookList
+        if(fragmentContainer == null && fragmentContainer2 == null){
+            setBookJSON();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else if(fragmentContainer instanceof ViewPagerFragment){
+            books = ((ViewPagerFragment) fragmentContainer).getBookList();
+        }else if(fragmentContainer2 instanceof BookListFragment){
+            books = ((BookListFragment) fragmentContainer2).getBookList();
         }
+
+        //Wait for worker thread to finish gathering books from API
+
 
         //Check if in single pane mode
         singlePane = (findViewById(R.id.container_2) == null);
@@ -78,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         //Add the viewPager of bookDetailsFragments
         ViewPagerFragment vpf = ViewPagerFragment.newInstance(books);
 
-        Fragment fragmentContainer = getSupportFragmentManager().findFragmentById(R.id.container);
 
         if(singlePane){
                 getSupportFragmentManager().beginTransaction()
@@ -143,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                         bookJSON = new JSONArray((String) builder.toString());
                         //Create arrayList of books from JSON
                         books = createBookList(bookJSON);
-                        Log.d("HER HERE HERE", books.get(0).getTitle());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -157,10 +172,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
     @Override
     public void onBookListInteraction(Book book) {
-        //Pass book title to details fragment
-        BookDetailsFragment bdf = BookDetailsFragment.newInstance(book);
 
-        if(!singlePane){
+        Fragment bdf =  getSupportFragmentManager().findFragmentById(R.id.container);
+
+        //If Book Details fragment already exists
+        if(bdf instanceof BookDetailsFragment && !singlePane){
+            ((BookDetailsFragment) bdf).displayBook(book);
+        }else if(!singlePane){
+            //Create new book details fragment
+            bdf = BookDetailsFragment.newInstance(book);
             getSupportFragmentManager().beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.container, bdf)

@@ -112,6 +112,11 @@ public class BookListFragment extends Fragment {
         }
     }
 
+    //Method to pass on the bookList to another fragment
+    public ArrayList<Book> getBookList(){
+        return books;
+    }
+
 
     public interface BookListListener {
         public void onBookListInteraction(Book book);
