@@ -15,8 +15,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         public boolean handleMessage(Message msg) {
             try {
                 bookJSON = new JSONArray((String) msg.obj);
-//                Log.d("TITLE TITLE", bookJSON.getJSONObject(0).getString("title"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -72,9 +74,13 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         fragmentContainer = getSupportFragmentManager().findFragmentById(R.id.container);
         fragmentContainer2 = getSupportFragmentManager().findFragmentById(R.id.container_2);
 
+        //Search bar and button
+        final EditText searchText = findViewById(R.id.searchText);
+        Button searchButton = findViewById(R.id.searchButton);
+
         //Set the bookList
         if(fragmentContainer == null && fragmentContainer2 == null){
-            setBookJSON();
+            setBookJSON("");
             try {
                 t.join();
             } catch (InterruptedException e) {
@@ -86,35 +92,48 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             books = ((BookListFragment) fragmentContainer2).getBookList();
         }
 
-        //Wait for worker thread to finish gathering books from API
-
 
         //Check if in single pane mode
         singlePane = (findViewById(R.id.container_2) == null);
 
+        //Load in fragments
+        loadFragments(singlePane);
+
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String search = searchText.getText().toString();
+                setBookJSON(search);
+                loadFragments(singlePane);
+            }
+        });
+
+
+
+
+
+    }
+
+    public void loadFragments(boolean singlePane){
         //Add the viewPager of bookDetailsFragments
         ViewPagerFragment vpf = ViewPagerFragment.newInstance(books);
 
 
         if(singlePane){
-                getSupportFragmentManager().beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.container, vpf)
-                        .commit();
+            getSupportFragmentManager().beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.container, vpf)
+                    .commit();
         }else{
             //Create the book list fragment
             BookListFragment blf = BookListFragment.newInstance(books);
             fm = getSupportFragmentManager();
             fm.beginTransaction()
                     .addToBackStack(null)
-                .replace(R.id.container_2, blf)
-                .commit();
+                    .replace(R.id.container_2, blf)
+                    .commit();
         }
-
-
-
-
-
     }
 
     public ArrayList<Book> createBookList(JSONArray bookJSON){
@@ -138,15 +157,16 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         return bookList;
     }
 
-    public void setBookJSON(){
-
+    public void setBookJSON(String search){
+        final String urlString = "https://kamorris.com/lab/audlib/booksearch.php?search=" + search;
         t = new Thread(){
 
             public void run(){
+
                 URL url;
 
                 try{
-                    url = new URL("https://kamorris.com/lab/audlib/booksearch.php");
+                    url = new URL(urlString);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                     StringBuilder builder =  new StringBuilder();
                     String response = reader.readLine();
