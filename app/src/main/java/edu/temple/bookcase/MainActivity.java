@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     AudiobookService.MediaControlBinder binder;
     boolean connected;
 
+    Intent intent;
+
 
     //Mechanism to let client know it is connected to service
     //Also gives a tool to speak to the service
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         Button stopButton = findViewById(R.id.stopButton);
         SeekBar seekBar = findViewById(R.id.seekBar);
 
-        Intent intent = new Intent(this, AudiobookService.class);
+        intent = new Intent(this, AudiobookService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);  //Bind service instead of start
 
         //Set the bookList
@@ -158,7 +160,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Stop using the stop method
                 binder.stop();
+
+                //Stop the actual service that's running
+                stopService(intent);
             }
         });
 
@@ -272,6 +278,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
     @Override
     public void onPlayButtonInteraction(int id) {
+        this.startService(intent);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);  //Bind service instead of start
         binder.play(id);
     }
 }
