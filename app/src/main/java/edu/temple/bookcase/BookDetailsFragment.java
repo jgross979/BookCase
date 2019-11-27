@@ -1,5 +1,6 @@
 package edu.temple.bookcase;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,12 +22,15 @@ import java.net.URL;
 
 public class BookDetailsFragment extends Fragment {
 
+    private BookDetailsListener mListener;
+
     //Keys
     private static final String BOOK_ID = "bookID";
     private static final String BOOK_TITLE = "bookTitle";
     private static final String BOOK_AUTHOR = "bookAuthor";
     private static final String BOOK_PUBLISHED = "bookPublished";
     private static final String BOOK_COVER_URL = "bookCoverURL";
+    private static final String BOOK_DURATION = "bookDuration";
 
     //Book Variables
     private int bookID;
@@ -32,12 +38,15 @@ public class BookDetailsFragment extends Fragment {
     private String bookAuthor;
     private int bookPublished;
     private String bookCoverURL;
+    private int bookDuration;
 
     //Views
     TextView titleText;
     TextView authorText;
     TextView bookPublishedText;
     ImageView bookCover;
+
+    Button playButton;
 
 
 
@@ -55,6 +64,7 @@ public class BookDetailsFragment extends Fragment {
         args.putString(BOOK_AUTHOR, book.getAuthor());
         args.putInt(BOOK_PUBLISHED, book.getPublished());
         args.putString(BOOK_COVER_URL, book.getCoverURL());
+        args.putInt(BOOK_DURATION, book.getDuration());
 
         fragment.setArguments(args);
         return fragment;
@@ -69,6 +79,7 @@ public class BookDetailsFragment extends Fragment {
             bookAuthor = getArguments().getString(BOOK_AUTHOR);
             bookPublished = getArguments().getInt(BOOK_PUBLISHED);
             bookCoverURL = getArguments().getString(BOOK_COVER_URL);
+            bookDuration = getArguments().getInt(BOOK_DURATION);
         }
     }
 
@@ -82,6 +93,8 @@ public class BookDetailsFragment extends Fragment {
         bookCover = v.findViewById(R.id.bookCover);
         bookPublishedText = v.findViewById(R.id.publishedText);
 
+        playButton = v.findViewById(R.id.playButton);
+
         //Set text and the image URL
         titleText.setText(bookTitle);
         authorText.setText(bookAuthor);
@@ -92,10 +105,34 @@ public class BookDetailsFragment extends Fragment {
         //Load URL image into book cover
         Picasso.get().load(bookCoverURL).fit().into(bookCover);
 
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onPlayButtonInteraction(bookID);
+            }
+        });
+
 
 //        displayBook(bookName, v);
 
         return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof BookDetailsListener) {
+            mListener = (BookDetailsListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
 
@@ -105,6 +142,10 @@ public class BookDetailsFragment extends Fragment {
          authorText.setText(book.getAuthor());
          bookPublishedText.setText(Integer.toString(book.getPublished()));
          Picasso.get().load(book.getCoverURL()).fit().into(bookCover);
+    }
+
+    public interface BookDetailsListener{
+        public void onPlayButtonInteraction(int id);
     }
 
 

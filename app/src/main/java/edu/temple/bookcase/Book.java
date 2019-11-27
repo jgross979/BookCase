@@ -3,7 +3,6 @@ package edu.temple.bookcase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 
 public class Book implements Parcelable {
 
@@ -12,13 +11,15 @@ public class Book implements Parcelable {
     private String author;
     private int published;
     private String coverURL;
+    private int duration;
 
-    public Book(int id, String title, String author, int published, String coverURL){
+    public Book(int id, String title, String author, int published, String coverURL, int duration){
         this.id = id;
         this.title = title;
         this.author = author;
         this.published = published;
         this.coverURL = coverURL;
+        this.duration = duration;
     }
 
     public int getId() {
@@ -42,6 +43,8 @@ public class Book implements Parcelable {
         return coverURL;
     }
 
+    public int getDuration() { return duration;}
+
     @Override
     public int describeContents() {
         return 0;
@@ -54,6 +57,7 @@ public class Book implements Parcelable {
         dest.writeString(author);
         dest.writeInt(published);
         dest.writeString(coverURL);
+        dest.writeInt(duration);
     }
 
     public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>() {
@@ -72,5 +76,6 @@ public class Book implements Parcelable {
         this.author = in.readString();
         this.published = in.readInt();
         this.coverURL = in.readString();
+        this.duration = in.readInt();
     }
 }
