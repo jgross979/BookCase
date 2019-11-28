@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,15 +63,32 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     private Fragment fragmentContainer;
     private Fragment fragmentContainer2;
 
-    //To be set for each change of BookDetailsFragment
-    Button playButton;
-
     /********AUDIO SERVICE SETUP********/
     //Initialize Audio Service Binder
     AudiobookService.MediaControlBinder binder;
     boolean connected;
+    boolean paused;
 
     Intent intent;
+    SeekBar seekBar;
+    TextView nowPlaying;
+
+    int bookDuration;
+    int bookID;
+
+
+    //TODO Look at the instructions and make a version of the handler provided
+    public Handler progressHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(final Message msg) {
+            if(!paused){
+                AudiobookService.BookProgress progress = (AudiobookService.BookProgress) msg.obj;
+                int prog = progress.getProgress();
+                seekBar.setProgress(prog);
+            }
+            return true;
+        }
+    });
 
 
     //Mechanism to let client know it is connected to service
@@ -118,9 +136,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         Button searchButton = findViewById(R.id.searchButton);
 
         //Audio playback views
-        Button pauseButton = findViewById(R.id.pauseButton);
+        final Button pauseButton = findViewById(R.id.pauseButton);
         Button stopButton = findViewById(R.id.stopButton);
-        SeekBar seekBar = findViewById(R.id.seekBar);
+
+        //Set seekbar values
+        seekBar = findViewById(R.id.seekBar);
+        seekBar.setMin(0);
+
+        //Set now playing TextView
+        nowPlaying = findViewById(R.id.nowPlaying);
 
         intent = new Intent(this, AudiobookService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);  //Bind service instead of start
@@ -157,6 +181,21 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             }
         });
 
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binder.pause();
+                if(paused == false){
+                    paused = true;
+                    pauseButton.setText(R.string.cont);
+                }else{
+                    paused = false;
+                    pauseButton.setText(R.string.pause);
+                }
+
+            }
+        });
+
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,6 +204,28 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
                 //Stop the actual service that's running
                 stopService(intent);
+                pauseButton.setText(R.string.pause);
+                seekBar.setProgress(0);
+                nowPlaying.setText("");
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser && connected){
+                    binder.play(bookID, progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //Necessary for the listener
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //Necessary for the listener
             }
         });
 
@@ -274,12 +335,22 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     protected void onDestroy(){
         super.onDestroy();
         unbindService(serviceConnection); //unbind from service to prevent memory leaks
+        nowPlaying.setText("");
     }
 
     @Override
-    public void onPlayButtonInteraction(int id) {
+    public void onPlayButtonInteraction(int id, int duration, String title) {
         this.startService(intent);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);  //Bind service instead of start
         binder.play(id);
+        bookDuration = duration;
+        bookID = id;
+        binder.setProgressHandler(progressHandler);
+        paused = false;
+        seekBar.setMax(bookDuration);
+        nowPlaying.setText("Now playing " + title + "...");
     }
+
+
+
 }

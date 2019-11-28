@@ -34,7 +34,7 @@
         android:id="@+id/searchButton"
         android:layout_width="117dp"
         android:layout_height="79dp"
-        android:text="GO"
+        android:text="@string/go"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -46,7 +46,7 @@
         android:id="@+id/pauseButton"
         android:layout_width="106dp"
         android:layout_height="70dp"
-        android:text="Pause"
+        android:text="@string/pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/stopButton"
         app:layout_constraintHorizontal_bias="1.0"
@@ -57,7 +57,7 @@
         android:id="@+id/stopButton"
         android:layout_width="88dp"
         android:layout_height="70dp"
-        android:text="STOP"
+        android:text="@string/stop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -67,12 +67,23 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="187dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="27dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nowPlaying" />
+
+    <TextView
+        android:id="@+id/nowPlaying"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        app:layout_constraintBottom_toBottomOf="@+id/seekBar"
+        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/container"
-        app:layout_constraintVertical_bias="0.071" />
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

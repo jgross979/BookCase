@@ -108,7 +108,7 @@ public class BookDetailsFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onPlayButtonInteraction(bookID);
+                mListener.onPlayButtonInteraction(bookID, bookDuration, bookTitle);
             }
         });
 
@@ -145,7 +145,7 @@ public class BookDetailsFragment extends Fragment {
     }
 
     public interface BookDetailsListener{
-        public void onPlayButtonInteraction(int id);
+        public void onPlayButtonInteraction(int id, int duration, String title);
     }
 
 
