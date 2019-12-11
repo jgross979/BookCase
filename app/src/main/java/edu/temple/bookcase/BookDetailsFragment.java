@@ -3,10 +3,12 @@ package edu.temple.bookcase;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,8 @@ public class BookDetailsFragment extends Fragment {
     private static final String BOOK_PUBLISHED = "bookPublished";
     private static final String BOOK_COVER_URL = "bookCoverURL";
     private static final String BOOK_DURATION = "bookDuration";
+    private static final String BOOK_DOWNLOADED = "bookDownloaded";
+    private static final String BOOK = "book";
 
     //Book Variables
     private int bookID;
@@ -39,6 +43,8 @@ public class BookDetailsFragment extends Fragment {
     private int bookPublished;
     private String bookCoverURL;
     private int bookDuration;
+    private int bookDownloaded;
+    private Book bookRec;
 
     //Views
     TextView titleText;
@@ -47,6 +53,8 @@ public class BookDetailsFragment extends Fragment {
     ImageView bookCover;
 
     Button playButton;
+    Button downloadButton;
+    Button deleteButton;
 
 
 
@@ -65,6 +73,8 @@ public class BookDetailsFragment extends Fragment {
         args.putInt(BOOK_PUBLISHED, book.getPublished());
         args.putString(BOOK_COVER_URL, book.getCoverURL());
         args.putInt(BOOK_DURATION, book.getDuration());
+        args.putInt(BOOK_DOWNLOADED, book.getIsDownloaded());
+        args.putParcelable(BOOK, book);
 
         fragment.setArguments(args);
         return fragment;
@@ -80,6 +90,8 @@ public class BookDetailsFragment extends Fragment {
             bookPublished = getArguments().getInt(BOOK_PUBLISHED);
             bookCoverURL = getArguments().getString(BOOK_COVER_URL);
             bookDuration = getArguments().getInt(BOOK_DURATION);
+            bookDownloaded = getArguments().getInt(BOOK_DOWNLOADED);
+            bookRec = getArguments().getParcelable(BOOK);
         }
     }
 
@@ -94,6 +106,8 @@ public class BookDetailsFragment extends Fragment {
         bookPublishedText = v.findViewById(R.id.publishedText);
 
         playButton = v.findViewById(R.id.playButton);
+        downloadButton = v.findViewById(R.id.downloadButton);
+        deleteButton = v.findViewById(R.id.deleteButton);
 
         //Set text and the image URL
         titleText.setText(bookTitle);
@@ -105,10 +119,46 @@ public class BookDetailsFragment extends Fragment {
         //Load URL image into book cover
         Picasso.get().load(bookCoverURL).fit().into(bookCover);
 
+        //Check if book is downloaded
+        if(bookDownloaded == 1){
+            downloadButton.setBackgroundColor(Color.DKGRAY);
+            deleteButton.setBackgroundColor(Color.LTGRAY);
+        }else{
+            deleteButton.setBackgroundColor(Color.DKGRAY);
+            downloadButton.setBackgroundColor(Color.LTGRAY);
+        }
+
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mListener.onPlayButtonInteraction(bookID, bookDuration, bookTitle);
+            }
+        });
+
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bookDownloaded == 0){
+                    mListener.onDownloadButtonInteraction(bookRec);
+                    downloadButton.setBackgroundColor(Color.DKGRAY);
+                    deleteButton.setBackgroundColor(Color.LTGRAY);
+                    bookDownloaded = 1;
+                    Log.d("BOOK DOWNLOAD", bookTitle + " downloaded");
+                }
+
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bookDownloaded == 1){
+                    mListener.onDeleteButtonInteraction(bookID, bookDuration, bookTitle);
+                    deleteButton.setBackgroundColor(Color.DKGRAY);
+                    downloadButton.setBackgroundColor(Color.LTGRAY);
+                    bookDownloaded = 0;
+                    Log.d("BOOK DELETION", bookTitle + " deleted from downloads");
+                }
             }
         });
 
@@ -146,6 +196,8 @@ public class BookDetailsFragment extends Fragment {
 
     public interface BookDetailsListener{
         public void onPlayButtonInteraction(int id, int duration, String title);
+        public void onDownloadButtonInteraction(Book bookRec);
+        public void onDeleteButtonInteraction(int id, int duration, String title);
     }
 
 

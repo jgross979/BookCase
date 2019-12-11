@@ -12,14 +12,16 @@ public class Book implements Parcelable {
     private int published;
     private String coverURL;
     private int duration;
+    private int isDownloaded; //Boolean 0 or 1
 
-    public Book(int id, String title, String author, int published, String coverURL, int duration){
+    public Book(int id, String title, String author, int published, String coverURL, int duration, int isDownloaded){
         this.id = id;
         this.title = title;
         this.author = author;
         this.published = published;
         this.coverURL = coverURL;
         this.duration = duration;
+        this.isDownloaded = isDownloaded;
     }
 
     public int getId() {
@@ -45,6 +47,12 @@ public class Book implements Parcelable {
 
     public int getDuration() { return duration;}
 
+    public int getIsDownloaded(){return isDownloaded;}
+
+    public void setIsDownloaded(int bool){
+        isDownloaded = bool;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -58,6 +66,7 @@ public class Book implements Parcelable {
         dest.writeInt(published);
         dest.writeString(coverURL);
         dest.writeInt(duration);
+        dest.writeInt(isDownloaded);
     }
 
     public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>() {
@@ -77,5 +86,6 @@ public class Book implements Parcelable {
         this.published = in.readInt();
         this.coverURL = in.readString();
         this.duration = in.readInt();
+        this.isDownloaded = in.readInt();
     }
 }
