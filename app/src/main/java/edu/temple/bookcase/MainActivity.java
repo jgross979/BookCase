@@ -528,7 +528,12 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser && connected){
+                if(fromUser && connected && currentlyDownloaded.contains(bookID)){
+                    File f = new File(getFilesDir(), ""  + bookID);
+                    currentProgress = progress;
+                    binder.play(f, progress);
+
+                } else if(fromUser && connected){
                     binder.play(bookID, progress);
                 }
             }
